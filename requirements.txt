@@ -2,3 +2,19 @@ requests
 fastapi
 uvicorn
 python-decouple
+# cds deps
+numpy
+pandas
+xarray
+netCDF4==1.6.2
+requests
+geopandas
+cdsapi
+cdsapi
+cfgrib
+rioxarray
+pydantic
+geojson
+matplotlib
+shapely
+simplejson

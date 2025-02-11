@@ -1,15 +1,6 @@
-# DHIS2 Climate Data Connector Example for Python
+# DHIS2 Climate Data Connector for Copernicus weather forecast data
 
-Minimalist example with dockerfile and instructions to setup a dhis2 climate data connector. 
-
-## Creating your own climate data connector
-
-This minimalist example contains a working version of a fastapi server that returns dummy data for any requests. 
-
-To create your own climate data connector, the only thing you need to do is replace the contents of the api endpoints `main.list` and `main.aggregate`,
-with your own code to list available climate datasets or aggregate raster data values to user-specified regions. 
-
-How you fetch and generate the data is entirely up to you. The only requirement is that the endpoints follow the api specification as described here (coming soon). 
+DHIS2 Climate Data Connector for Copernicus weather forecast data
 
 ## Secrets
 
@@ -20,14 +11,14 @@ Any secrets or environment variables needed to authenticate against a data provi
 Create a conda env:
 
 ```
->>> conda create python=3.13 -n climate-data-example-python
+>>> conda create python=3.8 -n climate-data-copernicus-forecast
 ```
 
 Install dependencies:
 
 ```
->>> conda activate climate-data-example-python
->>> pip install -r requirements.txts
+>>> conda activate climate-data-copernicus-forecast
+>>> pip install -r requirements.txt
 ```
 
 Run the fastapi server:
