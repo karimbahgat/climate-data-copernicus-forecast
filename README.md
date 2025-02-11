@@ -4,7 +4,10 @@ DHIS2 Climate Data Connector for Copernicus weather forecast data
 
 ## Secrets
 
-Any secrets or environment variables needed to authenticate against a data provider should be described here. This should include instructions for how to acquire and configure the necessary credentials, e.g. by setting them in a `.env` file in the root folder (not tracked by git). 
+- This data connector requires creating [an ECMWF account](https://www.ecmwf.int/user/login). Think of this as a single system user to be used by the data connector - this way endusers interacting with the data connector do not need to have an account. 
+- Copy the user credentials to `$HOME/.cdsapirc`, [as described here](https://cds.climate.copernicus.eu/how-to-api). 
+- As a one-time setup, it's necessary to manually agree to the license terms for each of the datasets that will be accessed using this connector, [as described here](https://confluence.ecmwf.int/display/CKB/Common+Error+Messages+for+CDS+Requests#CommonErrorMessagesforCDSRequests-RequestFailed:'Nolicenceagreement'errormessage). 
+    - More detailed instructions for accepting the relevant licenses coming soon... 
 
 ## Running locally
 
