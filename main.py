@@ -1,11 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from decouple import config
+import get_forecasts
 
 app = FastAPI(title="DHIS2 Climate Data Connector - Python Example")
 
 @app.get("/")
 def root():
     return {"message": "DHIS2 Climate Data Connector - Python Example is Running!"}
+
+#######
+# list
 
 @app.get("/list")
 def list():
@@ -16,14 +20,13 @@ def list():
     ]
     return datasets
 
+############
+# aggregate
+
 @app.get("/aggregate")
-def aggregate():
-    data = [
-        {
-        "ou": 'dfasfas',
-        "period": 'fromdate-todate',
-        "value": 50,
-        }
-    ]
+async def aggregate(request: Request):
+    request_data = await request.json()
+    print(request_data)
+    data = get_forecasts.aggregate(**request_data)
     metadata = {'response_date': '...'}
     return {"data": data, "metadata": metadata}
