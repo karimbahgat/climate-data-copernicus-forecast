@@ -16,7 +16,7 @@ os.chdir(CDS_REPO)
 from fetch_data import FetchCopernicusDataConfig, FetchCopernicusData
 
 
-def aggregate(geojson, dataset, period_type='month', reference_date=None):
+def aggregate(orgunits, dataset, period_type='month', reference_date=None):
     # init default config kwargs
     kwargs = dict(
         originating_centre="ecmwf",
@@ -28,7 +28,7 @@ def aggregate(geojson, dataset, period_type='month', reference_date=None):
     kwargs['file_name_postfix'] = "-" + str(request_id)
 
     # set geojson features
-    kwargs['features'] = geojson['features']
+    kwargs['features'] = orgunits['features']
     
     # set period type
     if period_type == 'month':
@@ -76,7 +76,7 @@ def aggregate(geojson, dataset, period_type='month', reference_date=None):
 
 if __name__ == '__main__':
     import json
-    geojson = json.load(open(os.path.join(CDS_REPO, 'sierraLeone.geojson')))
+    orgunits = json.load(open(os.path.join(CDS_REPO, 'sierraLeone.geojson')))
     dataset = 'total_precipitation'
-    results = aggregate(geojson, dataset)
+    results = aggregate(orgunits, dataset)
     print(results)
