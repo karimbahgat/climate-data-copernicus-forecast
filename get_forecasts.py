@@ -44,7 +44,6 @@ def aggregate(orgunits, dataset, period_type='month', period_start=None, period_
     # init default config kwargs
     kwargs = dict(
         originating_centre="ecmwf",
-        skip_download=False,
     )
 
     # set postfix as uid
@@ -57,11 +56,11 @@ def aggregate(orgunits, dataset, period_type='month', period_start=None, period_
     
     # set period type
     if period_type == 'month':
-        kwargs['periode_type'] = "M"
+        kwargs['period_type'] = "M"
     elif period_type == 'week':
-        kwargs['periode_type'] = "W-MON"
+        kwargs['period_type'] = "W-MON"
     elif period_type == 'day':
-        kwargs['periode_type'] = "D"
+        kwargs['period_type'] = "D"
     else:
         raise ValueError(period_type)
     
