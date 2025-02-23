@@ -1,10 +1,27 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from decouple import config
 import get_forecasts
 import json
 
 app = FastAPI(title="DHIS2 Climate Data Connector - Python Example")
+
+# 👇 Update this with your frontend URL
+origins = [
+    "http://localhost:3000",  # React dev server
+    "http://127.0.0.1:3000",  # React dev server alternative
+    "http://localhost:7000",  # If frontend also runs on this port
+    "*",  # 🚨 Allow all origins (use with caution in production)
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,            # List of allowed origins
+    allow_credentials=True,
+    allow_methods=["*"],              # Allow all HTTP methods
+    allow_headers=["*"],              # Allow all headers
+)
 
 def _get_test_geojson():
     import os
@@ -33,8 +50,9 @@ def list():
 class AggregateParams(BaseModel):
     orgunits: str = "TEST"
     dataset: str = "total_precipitation" or "2m_temperature"
-    period_type: str = 'month'
-    reference_date: str = ""
+    period_type: str = "month"
+    period_start: str = ""
+    period_end: str = ""
 
 @app.post("/aggregate")
 def aggregate(params: AggregateParams):
