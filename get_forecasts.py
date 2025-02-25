@@ -7,14 +7,18 @@ import uuid
 
 from datetime import datetime, timedelta
 import calendar
+from pathlib import Path
 
 
 # hardcode path import to the python CDS data code
 # TODO: remove
 CDS_REPO = r'C:\Users\karimba\Documents\Github\climate-data-store'
-RESULTS_FOLDER = os.path.join(CDS_REPO, 'results')
 sys.path.append(CDS_REPO)
 from fetch_data import FetchCopernicusDataConfig, FetchCopernicusData
+
+
+# set location of forecast data
+FORECAST_FOLDER = Path(__file__).parent / 'forecast_data'
 
 
 def get_week_dates(year, week):
@@ -32,34 +36,27 @@ def get_month_dates(year, month):
 
 
 
-def aggregate(orgunits, dataset, period_type='month', period_start=None, period_end=None, forecast_length=None):
-    # TEMP: return dummy data
-    # import time
-    # time.sleep(1)
-    # results_file = r"C:\Users\karimba\Documents\Github\climate-data-store\results\result_20250220-15-01-19_tp_ecmwf.csv"
-    # df = pd.read_csv(os.path.join(RESULTS_FOLDER, results_file), delimiter=';')
-    # results = df.to_dict(orient='records')
-    # return results
+def aggregate(orgunits, dataset, period_type='month', period_start=None, period_end=None):
+    # TODO: should use the SeasonalForecastHandler directly instead of going through FetchCopernicusData
 
     # init default config kwargs
-    kwargs = dict(
-        originating_centre="ecmwf",
-    )
+    kwargs = {}
+    centre = 'ecmwf'
+    kwargs['originating_centre'] = centre
 
     # set geojson features
     kwargs['features'] = orgunits['features']
 
     # set indicator name
     kwargs['indicator'] = dataset
+
+    # set output folder, ie where the data should be located
+    kwargs['output_folder'] = str(FORECAST_FOLDER)
     
     # get dataset
     print(kwargs)
     config = FetchCopernicusDataConfig(**kwargs)
     fetch_data = FetchCopernicusData(config)
-
-    # hardcode the netcdf file
-    # FIXME: just for testing
-    fetch_data.netcdf_file_name = 'netcdf/request_hash_cb8b2f753d86_precip_2025.nc'
 
     # next we define the forecast
     forecast_kwargs = {}
@@ -104,12 +101,16 @@ def aggregate(orgunits, dataset, period_type='month', period_start=None, period_
         raise ValueError(period_type)
 
     # period count
-    #forecast_kwargs['period_count'] = {'month':3, 'week':8, 'day':14}[period_type]
+    forecast_kwargs['period_count'] = {'month':6, 'week':8, 'day':30}[period_type]
 
     # set period end, ie forecast issued + leadtime hours
     #if not period_end:
     #    if period_type == 'month':
     #        forecast_days = 
+
+    # get the netcdf file based on request params
+    year = forecast_kwargs['forecast_date'].year
+    fetch_data.netcdf_file_name = f'{centre}_{dataset}_{year}.nc'
 
     # calculate
     sfh = fetch_data.get_forecast_handler(**forecast_kwargs)
@@ -125,6 +126,6 @@ if __name__ == '__main__':
     orgunits = json.load(open(os.path.join(CDS_REPO, 'data/sierraLeone.geojson')))
     dataset = '2m_temperature'
     period_type = 'month'
-    period_start = '2020-04'
+    period_start = '2025-01'
     results = aggregate(orgunits, dataset, period_type, period_start)
     print(results)
