@@ -46,26 +46,23 @@ def aggregate(orgunits, dataset, period_type='month', period_start=None, period_
         originating_centre="ecmwf",
     )
 
-    # set postfix as uid
-    #request_id = str(uuid.uuid4())
-    #kwargs['file_name_postfix'] = "_id_" + str(request_id)
-    kwargs['file_name_postfix'] = "_fastapi"
-
     # set geojson features
     kwargs['features'] = orgunits['features']
-    
-    # set period type
-    if period_type == 'month':
-        kwargs['period_type'] = "M"
-    elif period_type == 'week':
-        kwargs['period_type'] = "W-MON"
-    elif period_type == 'day':
-        kwargs['period_type'] = "D"
-    else:
-        raise ValueError(period_type)
-    
-    # set indicator
+
+    # set indicator name
     kwargs['indicator'] = dataset
+    
+    # get dataset
+    print(kwargs)
+    config = FetchCopernicusDataConfig(**kwargs)
+    fetch_data = FetchCopernicusData(config)
+
+    # hardcode the netcdf file
+    # FIXME: just for testing
+    fetch_data.netcdf_file_name = 'netcdf/request_hash_cb8b2f753d86_precip_2025.nc'
+
+    # next we define the forecast
+    forecast_kwargs = {}
     
     # set period start, ie forecast issued
     if period_start:
@@ -94,39 +91,33 @@ def aggregate(orgunits, dataset, period_type='month', period_start=None, period_
         # default to today
         forecast_issued = datetime.today()
 
-    kwargs['forecast_issued'] = forecast_issued
+    forecast_kwargs['forecast_date'] = forecast_issued
 
-    # forecast length
-    kwargs['forecast_length'] = {'month':3, 'week':8, 'day':14}[period_type]
+    # set period type
+    if period_type == 'month':
+        forecast_kwargs['period_type'] = "M"
+    elif period_type == 'week':
+        forecast_kwargs['period_type'] = "W-MON"
+    elif period_type == 'day':
+        forecast_kwargs['period_type'] = "D"
+    else:
+        raise ValueError(period_type)
+
+    # period count
+    #forecast_kwargs['period_count'] = {'month':3, 'week':8, 'day':14}[period_type]
 
     # set period end, ie forecast issued + leadtime hours
     #if not period_end:
     #    if period_type == 'month':
     #        forecast_days = 
 
-    # config
-    print(kwargs)
-    config = FetchCopernicusDataConfig(**kwargs)
+    # calculate
+    sfh = fetch_data.get_forecast_handler(**forecast_kwargs)
+    df = sfh.calculate()
 
-    # get data (results are stored in results folder)
-    fetch_data = FetchCopernicusData(config)
-    fetch_data.get_data()
-
-    # find the saved csv file in the results folder
-    # results_file = None
-    # for fil in os.listdir(RESULTS_FOLDER):
-    #     if fil.endswith(request_id):
-    #         results_file = fil
-    results_file = sorted(os.listdir(RESULTS_FOLDER))[-1] # just get latest result # TODO: Fix
-    
-    # load result csv into dicts
-    if results_file:
-        print(results_file)
-        df = pd.read_csv(os.path.join(RESULTS_FOLDER, results_file), delimiter=';')
-        results = df.to_dict(orient='records')
-
-        # return
-        return results
+    # return
+    results = df.to_dict(orient='records')
+    return results
     
 
 if __name__ == '__main__':
