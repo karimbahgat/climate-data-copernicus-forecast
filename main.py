@@ -4,8 +4,10 @@ from pydantic import BaseModel
 from decouple import config
 import get_forecasts
 import json
+import os
+from pathlib import Path
 
-app = FastAPI(title="DHIS2 Climate Data Connector - Python Example")
+app = FastAPI(title="CHAP Data Connector - Copernicus Forecasts")
 
 # 👇 Update this with your frontend URL
 origins = [
@@ -30,18 +32,21 @@ def _get_test_geojson():
 
 @app.get("/")
 def root():
-    return {"message": "DHIS2 Climate Data Connector - Python Example is Running!"}
+    return {"message": f"{app.title} is running!"}
 
 #######
 # list
 
 @app.get("/list")
 def list():
-    datasets = [
-        {"name": 'Name of dataset', 
-         "description": 'Some long description...', 
-         "aggregate_type": 'sum'},
-    ]
+    datasets = []
+    for file_name in os.listdir(Path(__file__).parent / 'forecast_data'):
+        name_parts = file_name.replace('.nc', '').split('_')
+        entry = {}
+        entry['centre'] = name_parts[0]
+        entry['year'] = name_parts[-1]
+        entry['name'] = '_'.join(name_parts[1:-1])
+        datasets.append(entry)
     return datasets
 
 ############

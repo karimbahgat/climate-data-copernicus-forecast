@@ -1,6 +1,6 @@
-# DHIS2 Climate Data Connector for Copernicus weather forecast data
+# CHAP Data Connector for Copernicus weather forecast data
 
-DHIS2 Climate Data Connector for Copernicus weather forecast data
+CHAP Data Connector for Copernicus weather forecast data
 
 ## Downloading forecast data
 
